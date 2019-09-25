@@ -6,6 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import proxy_pool
 
 
 class CrawlpatentSpiderMiddleware(object):
@@ -101,3 +102,16 @@ class CrawlpatentDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class ProxyMiddleware(object):
+
+    def process_request(self, request, spider):
+        # 使用代理
+        proxy = proxy_pool.get_random_proxy()
+        if proxy:
+            spider.logger.info('使用代理%s' % proxy)
+            request.meta['splash']['args']['proxy'] = proxy
+        else:
+            spider.logger.warning('代理获取失败，使用自己的IP')
+

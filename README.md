@@ -1,17 +1,18 @@
-# 专利爬虫
-## 1. scrapy
-异步爬虫框架
-## 2. Splash
-轻量级的web浏览器
-
-> Scrapy负责构造请求，之后请求交给Splash（可以是远程服务器）进行解析，
-> Splash会根据对应的lua脚本来解析请求后并返回字符串给scrapy，之后则交给
-> scrapy
->针对知网专利，
-### splash笔记
-> 1. splash如何显示等待页面的加载
-> 2. splash主要通过splash:evaljs(js代码)来获取到页面信息
-> 3. splash:wait()可以异步等待若干秒,即会做其他的任务，之后再继续执行。
-> 4. render.html render.png render.jpeg render.har render.json 包含着大量通用
-> 的功能，但是仅仅这样还是不太够的，这时候可以使用execute run。
-> splash使用的是lua，详情:[splash lua](https://splash.readthedocs.io/en/stable/scripting-overview.html)
+# Scrapy 专利详情爬虫
+>在得到一个url时，scrapy会首先把它发送给splash，之后splash（代理）在解析完成后会
+>返回response；在这个过程可能会由于代理的原因造成异常，目前不知道这个异常是由splash
+>处理还是由scrapy处理。
+>当得到一个可用的response之后，会尝试抽取信息，并保存页面结果。
+## 需要解决的问题
+> 1. 代理的设置
+> 2. 当splash通过代理访问页面失败时由scrapy处理 代理在scrapy传递给splash
+> 3. splash并不解析页面的结构，当出现验证码时需要换个代理重新请求
+> 4. 在页面有效的情况下会同时保存页面 （Item pipeline中进行）
+> 5. 爬取专利页面 在redis中创建一个唯一的
+> 6. 当请求失败时，scrapy会重试数次，如果一直失败，则默认抛弃。
+>
+>每隔一段时间，就会遍历files/page_links下的所有文件夹，然后
+>查看每个文件是否已经访问，如果不是，则传递给scrapy，开启并运行。
+>
+>要有两个线程，线程之间相互合作，生产者就是run.py 消费者则是scrapy，它们共同管理
+>着一个队列，run.py负责读取文件，并把数据放入队列中；而scrapy则负责从队列中提取数据
