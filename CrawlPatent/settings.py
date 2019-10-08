@@ -26,7 +26,7 @@ BASEDIR = os.path.realpath(os.path.dirname(os.path.dirname(os.path.dirname(__fil
 ROBOTSTXT_OBEY = False
 
 # 最大重试次数
-MAX_RETRY_TIMES = 10
+MAX_RETRY_TIMES = 20
 # mongo数据库相关
 MONGO_URI = 'mongodb://root:qwerty1234@47.107.246.172:27017/admin'
 MONGO_DB = 'patent'
@@ -94,6 +94,7 @@ SPIDER_MIDDLEWARES = {
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
+    'CrawlPatent.middlewares.GetFromLocalityMiddleware': 543,
     'CrawlPatent.middlewares.RetryOrErrorMiddleware': 550,
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
