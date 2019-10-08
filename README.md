@@ -31,3 +31,19 @@
 >
 >category_code 根据文件夹可以得知
 >是放在服务器上跑，还是跑完了一大类后再进行。。。
+>有的专利页面没有专利代理机构和代理人
+>### 数据提取
+>可以按照tr[style!='display:none']提取每一行，接着xpath('./td').extract()提取出
+>该行所有的td
+>(```)
+>for td in tds:
+>   if td.text() in self.mapping():
+>       key = self.mappings()
+>       value = td.next()
+>       item[key] = value
+>(```)
+>在访问一个json文件中的url的中间突然中断的时候，会造成剩下的链接无法再次获取。
+>计划添加一个全局的计数器，只有在写入到mongo后才会真正的写入到redis中。
+>为节省服务器的压力，可以从已经有的文件中直接读取文件
+>使用脚本每隔一段时间运行scrapy，但是在运行前会检测这个项目已经在运行，
+>如果有了则不执行。
