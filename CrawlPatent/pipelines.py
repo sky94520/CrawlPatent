@@ -118,7 +118,8 @@ class MongoPipeline(object):
 
         del item['source']
         self.db[item.collection].insert_one(dict(item))
-        return item
+        # 不返回item，则不再输出到控制台
+        # return item
 
     def close_spider(self, spider):
         self.client.close()

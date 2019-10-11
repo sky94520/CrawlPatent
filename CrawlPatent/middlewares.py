@@ -78,7 +78,7 @@ class ProxyMiddleware(object):
         # 最后一次尝试不使用代理
         if proxy and retry_times != max_retry_times:
             logger.info('使用代理%s' % proxy)
-            request.meta['splash']['args']['proxy'] = proxy
+            request.meta['splash']['args']['proxy'] = 'http://%s' % proxy
         else:
             reason = '代理获取失败' if proxy else ('达到最大重试次数[%d/%d]' % (retry_times, max_retry_times))
             logger.warning('%s，使用自己的IP' % reason)

@@ -17,7 +17,7 @@ BOT_NAME = 'CrawlPatent'
 SPIDER_MODULES = ['CrawlPatent.spiders']
 NEWSPIDER_MODULE = 'CrawlPatent.spiders'
 
-BASEDIR = os.path.realpath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+BASEDIR = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'CrawlPatent (+http://www.yourdomain.com)'
@@ -51,7 +51,7 @@ DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 NAME_FORMAT = "%H-%M-%S"
 
 now = datetime.datetime.now()
-filepath = os.path.join(BASEDIR, 'CrawlPatent', 'log', now.strftime("%Y-%m-%d"))
+filepath = os.path.join(BASEDIR, 'log', now.strftime("%Y-%m-%d"))
 
 if not os.path.exists(filepath):
     os.makedirs(filepath)
