@@ -1,0 +1,6 @@
+version: "2.2"
+services:
+   detail:
+     build: .
+     volumes:
+       - .:/code
