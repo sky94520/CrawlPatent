@@ -47,3 +47,11 @@
 >为节省服务器的压力，可以从已经有的文件中直接读取文件
 >使用脚本每隔一段时间运行scrapy，但是在运行前会检测这个项目已经在运行，
 >如果有了则不执行。
+>
+### splash笔记
+> 1. splash如何显示等待页面的加载
+> 2. splash主要通过splash:evaljs(js代码)来获取到页面信息
+> 3. splash:wait()可以异步等待若干秒,即会做其他的任务，之后再继续执行。
+> 4. render.html render.png render.jpeg render.har render.json 包含着大量通用
+> 的功能，但是仅仅这样还是不太够的，这时候可以使用execute run。
+> splash使用的是lua，详情:[splash lua](https://splash.readthedocs.io/en/stable/scripting-overview.html)

@@ -12,6 +12,7 @@ import pymongo
 import datetime
 import logging
 from scrapy.exceptions import DropItem
+from CrawlPatent.items import PatentItem
 
 
 logger = logging.getLogger(__name__)
@@ -90,6 +91,8 @@ class MongoPipeline(object):
         self.mongo_db = mongo_db
         self.client = None
         self.db = None
+        # 缓冲区 一定数量则填充一次
+        self.buffer = []
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -117,9 +120,16 @@ class MongoPipeline(object):
             spdier.counter[item['source']] = (cur_count + 1, max_count)
 
         del item['source']
-        self.db[item.collection].insert_one(dict(item))
+        self.buffer.append(dict(item))
+        # 每1000个数据写入到数据库中
+        if len(self.buffer) >= 100:
+            self.db[PatentItem.collection].insert_many(self.buffer)
+            self.buffer.clear()
         # 不返回item，则不再输出到控制台
         # return item
 
     def close_spider(self, spider):
+        if len(self.buffer) > 0:
+            self.db[PatentItem.collection].insert_many(self.buffer)
+            self.buffer.clear()
         self.client.close()
