@@ -1,16 +1,21 @@
 # Scrapy 专利详情爬虫
+>## 思路
 >在得到一个url时，scrapy会使用代理，在解析完成后会
 >返回response；在这个过程可能会由于代理的原因造成异常，出现异常则再进行
 >相关处理。
->当得到一个可用的response之后，会尝试抽取信息，并保存页面结果。
-## 需要解决的问题
-> 1. ~~代理的设置~~
-> 4. 在页面有效的情况下会同时保存页面 （Item pipeline中进行）
-> 5. 爬取专利页面 在redis中创建一个唯一的
-> 6. 请求失败问题。
-> 7. scrapy的日志
-> 8. 数据清洗问题
->### 1.代理
+>当得到一个可用的response之后，会尝试抽取信息，并保存页面结果，之后保存到mongo数据库中。
+>## spider
+>detail 爬虫：负责爬取详情页
+>## middleware
+>1. GetFromLocalityMiddleware 用于从本地获取文件，如果获取成功，则直接从本地获取(之后可检测mongo数据库)
+>2. RetryOrErrorMiddleware 重写官方示例，添加一个报错日志
+>3. ProxyMiddleware 添加了代理
+>## pipeline
+>1. SavePagePipeline 保存到本地文件
+>2. FilterPipeline 把得到的item的格式改为正确的格式
+>3. MongoPipeline 保存到mongo数据库中
+>## 关于思路
+>### 1.代理     
 >当splash通过代理访问页面失败时由scrapy处理(scrapy middleware) 代理通过scrapy传递给splash
 >每隔一段时间，就会遍历files/page_links下的所有文件夹，然后
 >查看每个文件是否已经访问，如果不是，则传递给scrapy，开启并运行。
@@ -32,16 +37,10 @@
 >### 数据提取
 >可以按照tr[style!='display:none']提取每一行，接着xpath('./td').extract()提取出
 >该行所有的td
->(```)
+>```
 >for td in tds:
 >   if td.text() in self.mapping():
 >       key = self.mappings()
 >       value = td.next()
 >       item[key] = value
->(```)
->在访问一个json文件中的url的中间突然中断的时候，会造成剩下的链接无法再次获取。
->计划添加一个全局的计数器，只有在写入到mongo后才会真正的写入到redis中。
->为节省服务器的压力，可以从已经有的文件中直接读取文件
->使用脚本每隔一段时间运行scrapy，但是在运行前会检测这个项目已经在运行，
->如果有了则不执行。
->
+>```
