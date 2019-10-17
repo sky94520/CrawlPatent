@@ -76,13 +76,16 @@ class DetailSpider(scrapy.Spider):
         args = {
             'wait': random.randint(3, 6),
             'lua_source': self.script,
+            'images': 0,
+            'resource_timeout': 10,
         }
         meta = {
             'path': top['path'],
             'title': top['title'],
             'category_code': top['category_code'],
             'source': top['source'],
-            'max_retry_times': self.crawler.settings.get('MAX_RETRY_TIMES')
+            'max_retry_times': self.crawler.settings.get('MAX_RETRY_TIMES'),
+            'url': top['url'],
         }
         return SplashRequest(top['url'], callback=self.parse, endpoint='execute',
                              meta=meta, args=args)

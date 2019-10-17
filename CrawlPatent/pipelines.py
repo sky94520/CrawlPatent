@@ -55,19 +55,6 @@ class FilterPipeline(object):
         return item
 
 
-class JsonPipeline(object):
-
-    def process_item(self, item, spider):
-        publication_number = item['publication_number']
-
-        filename = os.path.join('%s.json' % publication_number)
-        copy = dict(item.copy())
-        del copy['response']
-        with open(filename, "w", encoding='utf-8') as fp:
-            fp.write(json.dumps(copy, ensure_ascii=False, indent=2))
-        return item
-
-
 class SavePagePipeline(object):
     def process_item(self, item, spider):
         response = item['response']
