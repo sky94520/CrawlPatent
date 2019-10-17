@@ -28,6 +28,8 @@ class DetailSpider(scrapy.Spider):
         self.pattern = re.compile(r'.*?【(.*?)】.*?')
         # 计数器 用于统计在各个json文件中已经抓取到的链接
         self.counter = {}
+        # 连续出错计数器
+        self.err_count = 0
 
     def start_requests(self):
         for datum in self.get_links():
@@ -112,6 +114,7 @@ class DetailSpider(scrapy.Spider):
                     index += 1
                 tr_index += 1
             yield item
+            self.err_count = 0
         # 页面解析错误，重试
         except Exception as e:
             self.logger.error('%s %s页面解析出错: %s, 重试' % (response.meta['category_code'], response.meta['title'], e))
@@ -119,4 +122,10 @@ class DetailSpider(scrapy.Spider):
             # request = response.request.copy()
             # request.meta['retry_times'] = retry_times
             # yield request
+            # 当出错超过5次后，则睡眠5min后再请求
+            self.err_count += 1
+            if self.err_count >= 5:
+                self.err_count = 0
+                self.logger.error('出错次数为%d，睡眠5分钟' % self.err_count)
+                time.sleep(5 * 60)
 
