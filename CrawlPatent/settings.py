@@ -37,13 +37,6 @@ REDIS_CONFIG = {
     'password': None,
 }
 
-# 配置Splash
-SPLASH_URL = 'http://47.107.246.172:8050'
-# 去重
-DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
-# 配置Cache存储
-HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
-
 # 日志格式化输出
 LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 # 日期格式
@@ -84,21 +77,11 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt=DATE_FORMAT, 
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
 # }
-
-# Enable or disable spider middlewares
-# See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100
-}
-
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'CrawlPatent.middlewares.GetFromLocalityMiddleware': 543,
     'CrawlPatent.middlewares.RetryOrErrorMiddleware': 550,
-    'scrapy_splash.SplashCookiesMiddleware': 723,
-    'scrapy_splash.SplashMiddleware': 725,
-    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
     'CrawlPatent.middlewares.ProxyMiddleware': 843,
 }
 

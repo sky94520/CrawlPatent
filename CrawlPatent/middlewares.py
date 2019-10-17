@@ -26,15 +26,9 @@ class GetFromLocalityMiddleware(object):
         :param spider:
         :return:
         """
-        splash_url = spider.crawler.settings.get('SPLASH_URL')
-        splash_result = urlsplit(splash_url)
         # 提取出code
         url = request.url
         result = urlsplit(url)
-        # 不进行
-        if result.scheme == splash_result.scheme and result.netloc == splash_result.netloc:
-            return None
-
         tuple_list = parse_qsl(result.query)
         for key, value in tuple_list:
             if key == 'filename':
@@ -47,7 +41,8 @@ class GetFromLocalityMiddleware(object):
             fp = open(filepath, 'rb')
             bytes = fp.read()
             fp.close()
-            return SplashTextResponse(url=url, headers=request.headers, body=bytes, request=request)
+            # return SplashTextResponse(url=url, headers=request.headers, body=bytes, request=request)
+            return Response(url=url, headers=request.headers, body=bytes, request=request)
         return None
 
 
@@ -78,7 +73,7 @@ class ProxyMiddleware(object):
         # 最后一次尝试不使用代理
         if proxy and retry_times != max_retry_times:
             logger.info('使用代理%s' % proxy)
-            request.meta['splash']['args']['proxy'] = 'http://%s' % proxy
+            request.meta['proxy'] = 'http://%s' % proxy
         else:
             reason = '代理获取失败' if proxy else ('达到最大重试次数[%d/%d]' % (retry_times, max_retry_times))
             logger.warning('%s，使用自己的IP' % reason)

@@ -8,7 +8,7 @@ from urllib.parse import quote
 import random
 import redis
 
-from scrapy_splash import SplashRequest
+from scrapy import Request
 from CrawlPatent.items import PatentItem
 
 
@@ -25,13 +25,6 @@ class DetailSpider(scrapy.Spider):
     def __init__(self, redis_config, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db = redis.StrictRedis(**redis_config, decode_responses=True)
-        self.script = """
-        function main(splash, args)
-            assert(splash:go(args.url))
-            assert(splash:wait(args.wait))
-            return splash:html()
-        end
-        """
         self.pattern = re.compile(r'.*?【(.*?)】.*?')
         # 计数器 用于统计在各个json文件中已经抓取到的链接
         self.counter = {}
@@ -73,12 +66,6 @@ class DetailSpider(scrapy.Spider):
                 self.logger.info('File[%s] has loaded' % source)
 
     def create_request(self, top):
-        args = {
-            'wait': random.randint(3, 6),
-            'lua_source': self.script,
-            'images': 0,
-            'resource_timeout': 10,
-        }
         meta = {
             'path': top['path'],
             'title': top['title'],
@@ -87,8 +74,7 @@ class DetailSpider(scrapy.Spider):
             'max_retry_times': self.crawler.settings.get('MAX_RETRY_TIMES'),
             'url': top['url'],
         }
-        return SplashRequest(top['url'], callback=self.parse, endpoint='execute',
-                             meta=meta, args=args)
+        return Request(url=top['url'], callback=self.parse, meta=meta)
 
     def parse(self, response):
         item = PatentItem()
@@ -98,12 +84,11 @@ class DetailSpider(scrapy.Spider):
         item['category_code'] = response.meta['category_code']
         try:
             # 解析页面结构
-            tr_list = response.xpath('//table[@id="box"]/tbody/tr')
+            tr_list = response.xpath('//table[@id="box"]/tr')
             tr_index, tr_length = 0, len(tr_list)
             # 去掉最后一个tr 最后一个tr
-            while tr_index < tr_length - 1:
+            while tr_index < tr_length:
                 td_list = tr_list[tr_index].xpath('./td')
-                tr_index += 1
                 index, length, real_key = 0, len(td_list), None
 
                 while index < length:
@@ -125,6 +110,7 @@ class DetailSpider(scrapy.Spider):
                         else:
                             index += 1
                     index += 1
+                tr_index += 1
             yield item
         # 页面解析错误，重试
         except Exception as e:
