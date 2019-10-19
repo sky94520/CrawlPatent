@@ -9,8 +9,8 @@ import scrapy
 
 
 class PatentItem(scrapy.Item):
-    # 数据库集合名称
-    collection = 'patent'
+    # 数据库集合名称 发明授权专利
+    collection = 'invention_patent'
     mapping = {
         '申请号': 'application_number', '申请日': 'application_date',
         '公开号': 'publication_number', '公开日': 'publication_date',

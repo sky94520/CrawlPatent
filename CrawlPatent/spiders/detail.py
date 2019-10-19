@@ -7,6 +7,7 @@ import time
 from urllib.parse import quote
 import random
 import redis
+from urllib.parse import urlencode
 
 from scrapy import Request
 from CrawlPatent.items import PatentItem
@@ -30,6 +31,7 @@ class DetailSpider(scrapy.Spider):
         self.counter = {}
         # 连续出错计数器
         self.err_count = 0
+        self.base_url = 'http://dbpub.cnki.net/grid2008/dbpub/detail.aspx'
 
     def start_requests(self):
         for datum in self.get_links():
@@ -67,16 +69,18 @@ class DetailSpider(scrapy.Spider):
                     yield datum
                 self.logger.info('File[%s] has loaded' % source)
 
-    def create_request(self, top):
+    def create_request(self, datum):
+        params = {'dbcode': datum['dbcode'], 'dbname': datum['dbname'], 'filename': datum['filename']}
+        url = '%s?%s' % (self.base_url, urlencode(params))
         meta = {
-            'path': top['path'],
-            'title': top['title'],
-            'category_code': top['category_code'],
-            'source': top['source'],
+            'path': datum['path'],
+            'title': datum['title'],
+            'category_code': datum['category_code'],
+            'source': datum['source'],
             'max_retry_times': self.crawler.settings.get('MAX_RETRY_TIMES'),
-            'url': top['url'],
+            'publication_number': datum['filename'],
         }
-        return Request(url=top['url'], callback=self.parse, meta=meta)
+        return Request(url=url, callback=self.parse, meta=meta)
 
     def parse(self, response):
         item = PatentItem()

@@ -5,12 +5,9 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-from scrapy import signals
 import os
-from urllib.parse import urlsplit, parse_qsl
 import proxy_pool
 from scrapy.http import Response
-from scrapy.exceptions import IgnoreRequest
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 import logging
 
@@ -27,16 +24,7 @@ class GetFromLocalityMiddleware(object):
         :return:
         """
         # 提取出code
-        filename = None
-        url = request.url
-        result = urlsplit(url)
-        tuple_list = parse_qsl(result.query)
-        for key, value in tuple_list:
-            if key == 'filename':
-                filename = value
-        # 未提取到filename，则抛出异常
-        if not filename:
-            raise IgnoreRequest('url error: %s' % url)
+        filename = request.meta['publication_number']
         # 文件存放位置
         path = request.meta['path']
         # 该路径存在该文件
@@ -45,12 +33,8 @@ class GetFromLocalityMiddleware(object):
             fp = open(filepath, 'rb')
             bytes = fp.read()
             fp.close()
-            return Response(url=url, headers=request.headers, body=bytes, request=request)
+            return Response(url=request.url, headers=request.headers, body=bytes, request=request)
         return None
-
-    def process_exception(self, request, exception, spider):
-        logger.error(exception)
-        return
 
 
 class RetryOrErrorMiddleware(RetryMiddleware):
