@@ -51,7 +51,7 @@ if not os.path.exists(filepath):
 # 仅仅把错误及其以上存入文件
 filename = os.path.join(filepath, "%s.txt" % now.strftime("%H-%M-%S"))
 fp = logging.FileHandler(filename, "w", encoding="utf-8")
-fp.setLevel(logging.WARNING)
+fp.setLevel(logging.INFO)
 
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt=DATE_FORMAT, handlers=[fp])
 
