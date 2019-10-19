@@ -18,7 +18,11 @@ class DetailSpider(scrapy.Spider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
+        # 使用哪个
+        REDIS_DB = int(os.getenv('REDIS_DB', 5))
         REDIS_CONFIG = crawler.settings.get('REDIS_CONFIG')
+        REDIS_CONFIG['db'] = REDIS_DB
+
         spider = cls(REDIS_CONFIG, *args, **kwargs)
         spider._set_crawler(crawler)
         return spider

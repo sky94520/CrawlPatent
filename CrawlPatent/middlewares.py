@@ -7,7 +7,7 @@
 
 import os
 import proxy_pool
-from scrapy.http import Response
+from scrapy.http import Response, HtmlResponse
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 import logging
 
@@ -31,9 +31,9 @@ class GetFromLocalityMiddleware(object):
         filepath = os.path.join(path, '%s.html' % filename)
         if os.path.exists(filepath):
             fp = open(filepath, 'rb')
-            bytes = fp.read()
+            body = fp.read()
             fp.close()
-            return Response(url=request.url, headers=request.headers, body=bytes, request=request)
+            return HtmlResponse(url=request.url, headers=request.headers, body=body, request=request)
         return None
 
 

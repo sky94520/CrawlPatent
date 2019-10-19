@@ -4,3 +4,4 @@ venv
 files
 config.py
 log
+.env
