@@ -33,6 +33,8 @@ class GetFromLocalityMiddleware(object):
             fp = open(filepath, 'rb')
             body = fp.read()
             fp.close()
+            # 从本地加载的文件不再重新写入
+            request.meta['load_from_local'] = True
             return HtmlResponse(url=request.url, headers=request.headers, body=body, request=request)
         return None
 

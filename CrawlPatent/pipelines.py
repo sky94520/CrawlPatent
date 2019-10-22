@@ -58,9 +58,12 @@ class FilterPipeline(object):
 class SavePagePipeline(object):
     def process_item(self, item, spider):
         response = item['response']
+        # 该文件从本地获取，不再重新保存
+        if 'load_from_local' in response.meta and response.meta['load_from_local']:
+            return item
 
         path = response.meta['path']
-        publication_number = item['publication_number']
+        publication_number = response.meta['publication_number']
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -95,9 +98,9 @@ class MongoPipeline(object):
     def process_item(self, item, spdier):
         # 通过application_number保证唯一
         collection = self.db[item.collection]
-        result = collection.find_one({'application_number': item['application_number']}, {'_id': 1})
+        result = collection.find_one({'publication_number': item['publication_number']}, {'_id': 1})
         if result is not None:
-            raise DropItem('the %s has already saved in database' % item['application_number'])
+            raise DropItem('the %s has already saved in database' % item['publication_number'])
         cur_count, max_count = spdier.counter[item['source']]
         # 只有在该json文件全部链接都爬取完成的时候，才会写入到redis中
         if cur_count + 1 >= max_count:
