@@ -96,6 +96,9 @@ class DetailSpider(scrapy.Spider):
             # 解析页面结构
             tr_list = response.xpath('//table[@id="box"]/tr')
             tr_index, tr_length = 0, len(tr_list)
+            # 页面结构出现问题，报错
+            if tr_length is 0:
+                raise ValueError('not found table[@id="box"]')
             # 去掉最后一个tr 最后一个tr
             while tr_index < tr_length:
                 td_list = tr_list[tr_index].xpath('./td')
